@@ -18,5 +18,13 @@
     <ClCompile Include="Main.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="HuffmanTree.c">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HuffmanTree.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
