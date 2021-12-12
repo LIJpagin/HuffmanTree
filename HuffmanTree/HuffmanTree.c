@@ -33,9 +33,9 @@ BinaryTree* createBinaryTree(uint16_t capacity) {
 
 void fillBinaryTree(BinaryTree* tree, uint64_t frequency_table[]) {
     uint8_t j = 0;
-    for (uint16_t i = 0; i <= UCHAR_MAX; ++i)
+    for (uint16_t i = 0; i <= UINT8_MAX; ++i)
         if (frequency_table[i] != 0) {
-            tree->array[j++] = newNode((char)(i + SCHAR_MIN), frequency_table[i]);
+            tree->array[j++] = newNode((char)(i + INT8_MIN), frequency_table[i]);
             tree->size++;
         }
 }
@@ -125,15 +125,15 @@ void getCodes(Node* root, HuffmanCode codes[], uint64_t code, char number_of_bit
         getCodes(root->right, codes, code, number_of_bits);
     }
     if (isLeaf(root)) {
-        codes[(int)root->symbol + SCHAR_MAX].code = code;
-        codes[(int)root->symbol + SCHAR_MAX].size = number_of_bits;
+        codes[(int)root->symbol - INT8_MIN].code = code;
+        codes[(int)root->symbol - INT8_MIN].size = number_of_bits;
     }
 }
 
 void printCodes(HuffmanCode codes[]) {
-    for (uint16_t i = 0; i <= UCHAR_MAX; i++)
+    for (uint16_t i = 0; i <= UINT8_MAX; i++)
         if (codes[i].code != 0) {
-            printf("%4i| %13ld| %4i\n", i - SCHAR_MAX, codes[i].code, codes[i].size);
+            printf("%4i| %13ld| %4i\n", i + INT8_MIN, codes[i].code, codes[i].size);
             //unsigned long code = codes[i].code;
             //printf("%4i: ", i - SCHAR_MAX);
             //for (int bit = 0; bit < sizeof(code) * 8 - codes[i].size; bit++) {
