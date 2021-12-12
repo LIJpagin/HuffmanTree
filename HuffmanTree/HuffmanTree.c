@@ -5,9 +5,9 @@ uint16_t fillInFrequencyTable(FILE* file, uint64_t frequency_table[]) {
     uint16_t number_dif_char = 0;
     while (!feof(file)) {
         symbol = fgetc(file);
-        if (frequency_table[(int)symbol + SCHAR_MAX] == 0)
+        if (frequency_table[(int)symbol - INT8_MIN] == 0)
             number_dif_char++;
-        frequency_table[(int)symbol + SCHAR_MAX]++;
+        frequency_table[(int)symbol - INT8_MIN]++;
     }
     return number_dif_char;
 }
@@ -113,7 +113,7 @@ FILE* openFile(char mode) {
     return file;
 }
 
-void getCodes(Node* root, HuffmanCode codes[], uint64_t code, char number_of_bits) {
+void getCodes(Node* root, HuffmanCode codes[], uint64_t code, uint8_t number_of_bits) {
     if (root->left) {
         code = (code << 1) | 0;
         number_of_bits++;
@@ -133,17 +133,17 @@ void getCodes(Node* root, HuffmanCode codes[], uint64_t code, char number_of_bit
 void printCodes(HuffmanCode codes[]) {
     for (uint16_t i = 0; i <= UINT8_MAX; i++)
         if (codes[i].code != 0) {
-            printf("%4i| %13ld| %4i\n", i + INT8_MIN, codes[i].code, codes[i].size);
-            //unsigned long code = codes[i].code;
-            //printf("%4i: ", i - SCHAR_MAX);
-            //for (int bit = 0; bit < sizeof(code) * 8 - codes[i].size; bit++) {
-            //    printf(" ");
-            //    code <<= 1;
-            //}
-            //for (int bit = 0; bit < codes[i].size; bit++) {
-            //    printf("%c", (code & (ULONG_MAX - (ULONG_MAX / 2))) ? '1' : '0');
-            //    code <<= 1;
-            //}
-            //printf("\n");
+            //printf("%4i| %13ld| %4i\n", i + INT8_MIN, codes[i].code, codes[i].size);
+            unsigned long code = codes[i].code;
+            printf("%4i: ", i + INT8_MIN);
+            for (int bit = 0; bit < sizeof(code) * 8 - codes[i].size; bit++) {
+                printf(" ");
+                code <<= 1;
+            }
+            for (int bit = 0; bit < codes[i].size; bit++) {
+                printf("%c", (code & (ULONG_MAX - (ULONG_MAX / 2))) ? '1' : '0');
+                code <<= 1;
+            }
+            printf("\n");
         }
 }

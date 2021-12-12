@@ -34,5 +34,5 @@ void insertNode(BinaryTree*, Node*, uint16_t);
 int64_t compare(const void*, const void*);
 
 FILE* openFile(char);
-void getCodes(Node*, HuffmanCode[], uint64_t, char);
+void getCodes(Node*, HuffmanCode[], uint64_t, uint8_t);
 void printCodes(HuffmanCode[]);
