@@ -3,35 +3,37 @@
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 typedef struct Node {
     char symbol;
-    unsigned long freq;
+    uint64_t freq;
     struct Node* left, * right;
 } Node;
 typedef struct BinaryTree {
-    unsigned size;
-    unsigned capacity;
+    uint16_t size;
+    uint16_t capacity;
     Node** array;
 } BinaryTree;
 typedef struct HuffmanCode {
-    unsigned long code;
-    unsigned char size;
+    uint64_t code;
+    uint8_t size;
 } HuffmanCode;
 
-unsigned fillInFrequencyTable(FILE*, unsigned[]);
+uint16_t fillInFrequencyTable(FILE*, uint64_t[]);
 
-Node* newNode(char, unsigned);
-BinaryTree* createBinaryTree(unsigned);
-void fillBinaryTree(BinaryTree*, unsigned[]);
-Node* buildHuffmanTree(unsigned[], unsigned);
+Node* newNode(char, uint64_t);
+BinaryTree* createBinaryTree(uint16_t);
+void fillBinaryTree(BinaryTree*, uint64_t[]);
+Node* buildHuffmanTree(uint64_t[], uint16_t);
 
-int isSizeOne(BinaryTree*);
-int isLeaf(Node* root);
-Node* extractNode(BinaryTree*, unsigned);
-void insertNode(BinaryTree*, Node*, unsigned);
-unsigned long compare(const void* a, const void* b);
+bool isSizeOne(BinaryTree*);
+bool isLeaf(Node*);
+Node* extractNode(BinaryTree*, uint16_t);
+void insertNode(BinaryTree*, Node*, uint16_t);
+int64_t compare(const void*, const void*);
 
 FILE* openFile(char);
-void getCodes(Node*, unsigned long[], unsigned long);
-void printCodes(unsigned long[]);
+void getCodes(Node*, HuffmanCode[], uint64_t, char);
+void printCodes(HuffmanCode[]);

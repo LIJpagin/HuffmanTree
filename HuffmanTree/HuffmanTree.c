@@ -1,8 +1,8 @@
 #include "HuffmanTree.h"
 
-unsigned fillInFrequencyTable(FILE* file, unsigned frequency_table[]) {
+uint16_t fillInFrequencyTable(FILE* file, uint64_t frequency_table[]) {
     char symbol = '\0';
-    unsigned number_dif_char = 0;
+    uint16_t number_dif_char = 0;
     while (!feof(file)) {
         symbol = fgetc(file);
         if (frequency_table[(int)symbol + SCHAR_MAX] == 0)
@@ -14,7 +14,7 @@ unsigned fillInFrequencyTable(FILE* file, unsigned frequency_table[]) {
 
 
 
-Node* newNode(char symbol, unsigned freq) {
+Node* newNode(char symbol, uint64_t freq) {
     Node* node = (Node*)malloc(sizeof(Node));
     node->symbol = symbol;
     node->freq = freq;
@@ -23,24 +23,24 @@ Node* newNode(char symbol, unsigned freq) {
     return node;
 }
 
-BinaryTree* createBinaryTree(unsigned capacity) {
+BinaryTree* createBinaryTree(uint16_t capacity) {
     BinaryTree* tree = (BinaryTree*)malloc(sizeof(BinaryTree));
     tree->size = 0;
     tree->capacity = capacity;
-    tree->array = (Node*)malloc(tree->capacity * sizeof(Node*));
+    tree->array = (Node**)malloc(tree->capacity * sizeof(Node*));
     return tree;
 }
 
-void fillBinaryTree(BinaryTree* tree, unsigned frequency_table[]) {
-    unsigned j = 0;
-    for (unsigned i = 0; i <= UCHAR_MAX; ++i)
+void fillBinaryTree(BinaryTree* tree, uint64_t frequency_table[]) {
+    uint8_t j = 0;
+    for (uint16_t i = 0; i <= UCHAR_MAX; ++i)
         if (frequency_table[i] != 0) {
             tree->array[j++] = newNode((char)(i + SCHAR_MIN), frequency_table[i]);
             tree->size++;
         }
 }
 
-Node* buildHuffmanTree(unsigned frequency_table[], unsigned number_dif_char) {
+Node* buildHuffmanTree(uint64_t frequency_table[], uint16_t number_dif_char) {
     Node* left, * right, * top;
     BinaryTree* tree = createBinaryTree(number_dif_char);
     fillBinaryTree(tree, frequency_table);
@@ -60,27 +60,27 @@ Node* buildHuffmanTree(unsigned frequency_table[], unsigned number_dif_char) {
 
 
 
-int isSizeOne(BinaryTree* tree) {
+bool isSizeOne(BinaryTree* tree) {
     return (tree->size == 1);
 }
 
-int isLeaf(Node* root) {
+bool isLeaf(Node* root) {
     return !(root->left) && !(root->right);
 }
 
-Node* extractNode(BinaryTree* tree, unsigned index) {
+Node* extractNode(BinaryTree* tree, uint16_t index) {
     Node* Node = tree->array[index];
     tree->array[index] = NULL;
     return Node;
 }
 
-void insertNode(BinaryTree* tree, Node* node, unsigned index) {
+void insertNode(BinaryTree* tree, Node* node, uint16_t index) {
     tree->array[index] = node;
 }
 
-unsigned long compare(const void* a, const void* b) {
-    unsigned long freqA = ((Node*)a)->freq;
-    unsigned long freqB = ((Node*)b)->freq;
+int64_t compare(const void* a, const void* b) {
+    int64_t freqA = ((Node*)a)->freq;
+    int64_t freqB = ((Node*)b)->freq;
     if (!freqA) return freqB;
     if (!freqB) return -freqA;
     return freqA - freqB;
@@ -113,7 +113,7 @@ FILE* openFile(char mode) {
     return file;
 }
 
-void getCodes(Node* root, HuffmanCode codes[], unsigned long code, char number_of_bits) {
+void getCodes(Node* root, HuffmanCode codes[], uint64_t code, char number_of_bits) {
     if (root->left) {
         code = (code << 1) | 0;
         number_of_bits++;
@@ -131,9 +131,9 @@ void getCodes(Node* root, HuffmanCode codes[], unsigned long code, char number_o
 }
 
 void printCodes(HuffmanCode codes[]) {
-    for (int i = 0; i <= UCHAR_MAX; i++)
+    for (uint16_t i = 0; i <= UCHAR_MAX; i++)
         if (codes[i].code != 0) {
-            printf("%4i| %13i| %4i\n", i - SCHAR_MAX, codes[i].code, codes[i].size);
+            printf("%4i| %13ld| %4i\n", i - SCHAR_MAX, codes[i].code, codes[i].size);
             //unsigned long code = codes[i].code;
             //printf("%4i: ", i - SCHAR_MAX);
             //for (int bit = 0; bit < sizeof(code) * 8 - codes[i].size; bit++) {
