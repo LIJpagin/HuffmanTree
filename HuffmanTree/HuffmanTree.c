@@ -44,6 +44,9 @@ Node* buildHuffmanTree(uint64_t frequency_table[], uint16_t number_dif_char) {
     fillBinaryTree(tree, frequency_table);
     while (!isSizeOne(tree)) {
         qsort(tree->array, tree->size, sizeof(Node*), compare);
+        for (size_t i = 0; i < tree->size; i++)
+            printf("%c|%ld ", tree->array[i]->symbol, tree->array[i]->freq);
+        printf("\n");
         left = extractNode(tree, 0);
         right = extractNode(tree, 1);
         top = newNode('$', left->freq + right->freq);
@@ -75,14 +78,9 @@ void insertNode(BinaryTree* tree, Node* node, uint16_t index) {
 }
 
 int64_t compare(const void* a, const void* b) {
-    //int64_t freqA = ((Node*)a)->freq;
-    //int64_t freqB = ((Node*)b)->freq;
-    //if (!freqA) return freqB;
-    //if (!freqB) return -freqA;
-    //return freqA - freqB;
-    int64_t freqA = ((Node*)a)->freq;
-    int64_t freqB = ((Node*)b)->freq;
-    return  freqA - freqB;
+    const Node* const* aa = a;
+    const Node* const* bb = b;
+    return (*aa)->freq - (*bb)->freq;
 }
 
 void getCodes(Node* root, HuffmanCode codes[], uint64_t code, uint8_t number_of_bits) {

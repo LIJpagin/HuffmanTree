@@ -1,4 +1,5 @@
 #include "ArchiverAndDearchiver.h"
+#include "HuffmanTree.h"
 
 #define getch _getch()
 #define pause system("pause")
@@ -54,6 +55,19 @@ void tree(char* basePath, const int root) {
         }
     }
     closedir(dir);
+}
+
+void stringTraversalTree(Node* root) {
+    if (root->left) {
+        printf("0");
+        stringTraversalTree(root->left);
+    }
+    if (root->right) {
+        printf("1");
+        stringTraversalTree(root->right);
+    }
+    if (isLeaf(root)) 
+        printf("%c", root->symbol);
 }
 
 void archiver(FILE* source, FILE* archive, HuffmanCode codes[], uint16_t number_dif_char) {

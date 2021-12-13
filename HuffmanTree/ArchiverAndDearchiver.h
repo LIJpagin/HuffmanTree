@@ -5,5 +5,6 @@
 FILE* openFile(char);
 void fileSize(FILE*);
 void tree(char*, const int);
+void stringTraversalTree(Node*);
 
 void archiver(FILE*, FILE*, HuffmanCode[], uint16_t);
