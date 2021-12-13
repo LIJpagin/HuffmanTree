@@ -1,9 +1,4 @@
-#include <locale.h>
-#include <malloc.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include "CommonHeader.h"
 
 typedef struct Node {
     char symbol;

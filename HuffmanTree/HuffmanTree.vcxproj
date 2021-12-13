@@ -140,10 +140,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ArchiverAndDearchiver.c" />
     <ClCompile Include="HuffmanTree.c" />
     <ClCompile Include="Main.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ArchiverAndDearchiver.h" />
+    <ClInclude Include="CommonHeader.h" />
+    <ClInclude Include="dirent.h" />
     <ClInclude Include="HuffmanTree.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
