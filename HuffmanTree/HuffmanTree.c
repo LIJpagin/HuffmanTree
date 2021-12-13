@@ -12,8 +12,6 @@ uint16_t fillInFrequencyTable(FILE* file, uint64_t frequency_table[]) {
     return number_dif_char;
 }
 
-
-
 Node* newNode(char symbol, uint64_t freq) {
     Node* node = (Node*)malloc(sizeof(Node));
     node->symbol = symbol;
@@ -58,8 +56,6 @@ Node* buildHuffmanTree(uint64_t frequency_table[], uint16_t number_dif_char) {
     return root;
 }
 
-
-
 bool isSizeOne(BinaryTree* tree) {
     return (tree->size == 1);
 }
@@ -87,32 +83,6 @@ int64_t compare(const void* a, const void* b) {
     int64_t freqA = ((Node*)a)->freq;
     int64_t freqB = ((Node*)b)->freq;
     return  freqA - freqB;
-}
-
-
-
-FILE* openFile(char mode) {
-    FILE* file = NULL;
-    char* file_path = (char*)malloc(UCHAR_MAX * sizeof(char));
-    memset(file_path, NULL, UCHAR_MAX);
-    do {
-        switch (mode) {
-        case 'w':
-            printf("Введите путь и имя для сохранения архива:\n");
-            break;
-        case 'r':
-        default:
-            printf("Введите путь к файлу для архивирования или к архиву для разархивации:\n");
-            break;
-        }
-        gets(file_path);
-        fopen_s(&file, file_path, "r");
-        if (file == NULL)
-            printf("Файл не обнаружен или не был открыт! Попробуйте снова.\n");
-    } while (file == NULL);
-    printf("Файл существует и успешно открыт.\n");
-    free(file_path);
-    return file;
 }
 
 void getCodes(Node* root, HuffmanCode codes[], uint64_t code, uint8_t number_of_bits) {

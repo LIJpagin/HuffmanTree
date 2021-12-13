@@ -6,3 +6,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+
+typedef struct HuffmanCode {
+    uint64_t code;
+    uint8_t size;
+} HuffmanCode;
