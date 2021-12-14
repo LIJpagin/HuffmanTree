@@ -44,9 +44,6 @@ Node* buildHuffmanTree(uint64_t frequency_table[], uint16_t number_dif_char) {
     fillBinaryTree(tree, frequency_table);
     while (!isSizeOne(tree)) {
         qsort(tree->array, tree->size, sizeof(Node*), compare);
-        for (size_t i = 0; i < tree->size; i++)
-            printf("%c|%ld ", tree->array[i]->symbol, tree->array[i]->freq);
-        printf("\n");
         left = extractNode(tree, 0);
         right = extractNode(tree, 1);
         top = newNode('$', left->freq + right->freq);
@@ -84,16 +81,10 @@ int64_t compare(const void* a, const void* b) {
 }
 
 void getCodes(Node* root, HuffmanCode codes[], uint64_t code, uint8_t number_of_bits) {
-    if (root->left) {
-        code = (code << 1) | 0;
-        number_of_bits++;
-        getCodes(root->left, codes, code, number_of_bits);
-    }
-    if (root->right) {
-        code = (code << 1) | 1;
-        number_of_bits++;
-        getCodes(root->right, codes, code, number_of_bits);
-    }
+    if (root->left)
+        getCodes(root->left, codes, (code << 1) | 0, number_of_bits + 1);
+    if (root->right)
+        getCodes(root->right, codes, (code << 1) | 1, number_of_bits + 1);
     if (isLeaf(root)) {
         codes[(int)root->symbol - INT8_MIN].code = code;
         codes[(int)root->symbol - INT8_MIN].size = number_of_bits;
@@ -103,17 +94,14 @@ void getCodes(Node* root, HuffmanCode codes[], uint64_t code, uint8_t number_of_
 void printCodes(HuffmanCode codes[]) {
     for (uint16_t i = 0; i <= UINT8_MAX; i++)
         if (codes[i].code != 0) {
-#if true
+#if false
             printf("%c | %13ld | %4i\n", i + INT8_MIN, codes[i].code, codes[i].size);
 #else
-            unsigned long code = codes[i].code;
-            printf("%c: ", i + INT8_MIN);
-            for (int bit = 0; bit < sizeof(code) * 8 - codes[i].size; bit++) {
-                printf(" ");
-                code <<= 1;
-            }
-            for (int bit = 0; bit < codes[i].size; bit++) {
-                printf("%c", (code & (ULONG_MAX - (ULONG_MAX / 2))) ? '1' : '0');
+            uint64_t code = codes[i].code;
+            printf("%4i | %2i | ", i + INT8_MIN, codes[i].size);
+            for (int bit = 0; bit < sizeof(code) * 8; bit++) {
+                if (bit < sizeof(code) * 8 - codes[i].size) printf(".");
+                else printf("%i", (code & (UINT64_MAX - (UINT64_MAX / 2))) ? 1 : 0);
                 code <<= 1;
             }
             printf("\n");
