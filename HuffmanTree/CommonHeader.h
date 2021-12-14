@@ -1,14 +1,15 @@
 #pragma once
+#include <stdio.h>
 #include <locale.h>
 #include <malloc.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <stdbool.h>
+#include <limits.h>
 #include <string.h>
+#include <stdbool.h>
 
 typedef struct Node {
-    char symbol;
+    char byte;
     uint64_t freq;
     struct Node* left, * right;
 } Node;
