@@ -1,6 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "ArchiverAndDearchiver.h"
-#include "HuffmanTree.h"
 
 #define getch _getch()
 #define pause system("pause")
@@ -45,14 +44,15 @@ FILE* openFile(char mode) {
 }
 
 uint32_t fileSize(FILE* file) {
-    fseek(file, 0, SEEK_END);
-    uint32_t fileSizeBytes = ftell(file);
-    fseek(file, 0, SEEK_SET);
+    // можно узнать размер файла до 4гб, для сравнения 4 тома войны и мира в расширении .txt весят 3Мб
+    fseek(file, 0, SEEK_END); // установливаем указатель файла в конец файла
+    uint32_t fileSizeBytes = ftell(file); // получаем текущее положение указателя в байтах
+    fseek(file, 0, SEEK_SET); // возвращаем указатель на начало файла
     return (fileSizeBytes / 1024);
 }
 
-void tree(char* basePath, const int root) {
-    char path[1000];
+void archivingDirectory(char* basePath, const int root) {
+    char* path = (char*)malloc(sizeof(char) * 1000);
     struct dirent* dp;
     DIR* dir = opendir(basePath);
     if (!dir) return;
@@ -61,11 +61,12 @@ void tree(char* basePath, const int root) {
             strcpy_s(path, sizeof(path), basePath);
             strcat_s(path, sizeof(path), "\\");
             strcat_s(path, sizeof(path), dp->d_name);
-            printf("%s\n", path);
+            //printf("%s\n", path);
             //ЗДЕСЬ МОЖНО ЗАПУСКАТЬ КОДИРОВАНИЕ ФАЙЛА
             tree(path, root + 2);
         }
     }
+    free(path);
     closedir(dir);
 }
 
@@ -97,9 +98,12 @@ FILE* archiver(FILE* source) {
     // получаем таблицу частот встречаемости байтов информации в файле
     uint64_t frequency_table[UINT8_MAX + 1] = { 0 };
     uint16_t number_dif_bytes = fillInFrequencyTable(source, frequency_table);
+    // создаем бинарное дерево
+    BinaryTree* tree = createBinaryTree(number_dif_bytes);
+    // заполняем бираное дерево указателями на узлы
+    fillBinaryTree(tree, frequency_table);
     // строим дерево Хаффмана
-    Node* root = buildHuffmanTree(frequency_table, number_dif_bytes);
-
+    Node* root = buildHuffmanTree(tree, frequency_table, number_dif_bytes);
 
     //============================= КОДЫ ХАФФМАНА =============================//
 
@@ -117,7 +121,6 @@ FILE* archiver(FILE* source) {
     // создаем файл для архива
     FILE* archive = openFile('w');
     printf("Производится сжатие файла, пожалуйста, подождите...\n");
-
 
     //=================== ВЫВОД ИНФОРМАЦИИ ДЛЯ ДЕАРХИВАТОРА ===================//
 
@@ -171,6 +174,7 @@ FILE* archiver(FILE* source) {
     printf("Файл сжат!\n");
     printf("Размер файла: %d КБ\n", fileSize(archive));
     printf("Коэффициент сжатия файла: %4.3f\n", (float)fileSize(source) / (float)fileSize(archive));
+
     return archive;
 }
 

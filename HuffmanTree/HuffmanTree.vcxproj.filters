@@ -35,8 +35,5 @@
     <ClInclude Include="ArchiverAndDearchiver.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="CommonHeader.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

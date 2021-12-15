@@ -1,4 +1,4 @@
-#include "CommonHeader.h"
+#include "HuffmanTree.h"
 #include <sys/types.h>
 #include "dirent.h"
 
@@ -11,14 +11,19 @@ FILE* openFile(char);
 
 // function: вывод размера файла
 // arguments: FILE* file - указатель на файл
+// return: uint32_t file_size - размер файла в Кб
 uint32_t fileSize(FILE*);
 
+// function: создание строки прямого обхода в глубину бинарного дерева 
+// arguments:
+// FILE* file - указатель на архив для записи
+// Node* root - указатель на корень дерева Хаффмана
+// char* string_traversal - указатель на строку
 void stringTraversalTree(FILE*, Node*, char*);
 
 // function:
 // arguments:
-void tree(char*, const int);
-
+void archivingDirectory(char*, const int);
 
 // function: архивация файла
 // arguments: FILE* source - указатель на исходный файл

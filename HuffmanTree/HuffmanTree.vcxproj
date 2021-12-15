@@ -146,7 +146,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArchiverAndDearchiver.h" />
-    <ClInclude Include="CommonHeader.h" />
     <ClInclude Include="dirent.h" />
     <ClInclude Include="HuffmanTree.h" />
   </ItemGroup>

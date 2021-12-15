@@ -1,4 +1,26 @@
-#include "CommonHeader.h"
+#include <stdbool.h>
+#include <locale.h>
+#include <malloc.h>
+#include <limits.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+
+typedef struct Node {
+    char byte;
+    uint64_t freq;
+    struct Node* left, * right;
+} Node;
+typedef struct BinaryTree {
+    uint16_t size;
+    uint16_t capacity;
+    Node** array;
+} BinaryTree;
+typedef struct HuffmanCode {
+    uint64_t code;
+    uint8_t size;
+} HuffmanCode;
 
 // function: заполнение таблицы частот встречаемости байтов информации
 // arguments:
@@ -27,10 +49,11 @@ void fillBinaryTree(BinaryTree*, uint64_t[]);
 
 // function: построения дерева Хаффмана
 // arguments:
+// BinaryTree* tree - указатель на созданное банарное дерево
 // uint64_t frequency_table[] - таблица частот встречаимости байтов информации, заполненная определенным образом
 // uint16_t number_dif_char - количество различных байт в исходном файле
 // return: Node* root - указатель на корневой элемент дерева Хаффмана
-Node* buildHuffmanTree(uint64_t[], uint16_t);
+Node* buildHuffmanTree(BinaryTree*, uint64_t[], uint16_t);
 
 // function: проверка на условие равенства единице размера бинарного дерева
 // arguments: BinaryTree* tree - указатель на бинарное дерево

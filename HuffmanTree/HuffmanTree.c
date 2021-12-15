@@ -41,12 +41,8 @@ void fillBinaryTree(BinaryTree* tree, uint64_t frequency_table[]) {
         }
 }
 
-Node* buildHuffmanTree(uint64_t frequency_table[], uint16_t number_dif_char) {
+Node* buildHuffmanTree(BinaryTree* tree,uint64_t frequency_table[], uint16_t number_dif_char) {
     Node* left, * right, * top;
-    // создаем бинарное дерево
-    BinaryTree* tree = createBinaryTree(number_dif_char);
-    // заполняем бираное дерево указателями на узлы
-    fillBinaryTree(tree, frequency_table);
     // в цикле пока размер дерева не равен 1,
     // т.е. пока в дереве не останется только корень
     while (!isSizeOne(tree)) {
