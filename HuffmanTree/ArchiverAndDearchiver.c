@@ -122,7 +122,7 @@ FILE* archiver(FILE* source) {
     //=================== ¬џ¬ќƒ »Ќ‘ќ–ћј÷»» ƒЋя ƒ≈ј–’»¬ј“ќ–ј ===================//
 
     // записываем в выходной файл количество различных байтов в исходном файле
-    fwrite(number_dif_bytes, sizeof(number_dif_bytes), 1, archive);
+    fprintf(archive, "%u", number_dif_bytes);
 
     // записываем в выходной файл байты при пр€мом обходе дерева в глубину и одновременно создаем строку обхода
     char* str_raversal = (char*)malloc(sizeof(char) * (UINT8_MAX + 1) * 4);
@@ -130,14 +130,14 @@ FILE* archiver(FILE* source) {
     stringTraversalTree(archive, root, str_raversal);
 
     // выводим количество бит строки обхода дерева
-    fwrite((uint16_t)strcspn(str_raversal, "\0"), sizeof(uint16_t), 1, archive);
+    fprintf(archive, "%u", strcspn(str_raversal, "\0"));
 
     // выводим строку обхода побайтно
     uint8_t output_byte = 0, remainder = 0;
     for (uint16_t i = 0; i < strcspn(str_raversal, "\0"); i++) {
         // по маске выдел€ем первый слева бит кода и записываем его в байт дл€ вывода
         output_byte = output_byte | (str_raversal[i] == 'D' ? 1 : 0);
-        output_byte <<= 1; // сдвигаем код влевона единицу
+        output_byte <<= 1; // сдвигаем код влево на единицу
         if (i % CHAR_BIT == 0) // если позици€ в коде делитс€ без остатка на 8
             fputc(output_byte, archive); // выводим байт в выходной файл
     }
