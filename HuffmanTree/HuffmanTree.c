@@ -116,7 +116,7 @@ void printCodes(HuffmanCode codes[]) {
     if (_getch() != 27) { // функция _getch() возвращает код клавиши, 27 - код клавиши ESC
         system("cls");
         for (uint16_t i = 0; i <= UINT8_MAX; i++)
-            if (codes[i].code != 0) {
+            if (codes[i].size != 0) {
                 uint64_t code = codes[i].code; // используем временную переменную для вывода кода
                 // выводим байт информации в десятичном виде и количество бит в коде Хаффмана
                 printf("%4i | %2i | ", i + INT8_MIN, codes[i].size);

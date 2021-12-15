@@ -13,13 +13,17 @@ FILE* openFile(char);
 // arguments: FILE* file - указатель на файл
 uint32_t fileSize(FILE*);
 
+void stringTraversalTree(FILE*, Node*, char*);
+
 // function:
 // arguments:
 void tree(char*, const int);
 
 
-// function:
-// arguments:
+// function: архивация файла
+// arguments: FILE* source - указатель на исходный файл
 FILE* archiver(FILE*);
 
+// function: разорхивация файла
+// arguments: FILE* archiver - указатель на сжатый файл
 void dearchiver(FILE*);
