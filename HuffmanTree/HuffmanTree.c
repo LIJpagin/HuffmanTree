@@ -5,6 +5,7 @@ uint16_t fillInFrequencyTable(FILE* file, uint64_t frequency_table[]) {
     uint16_t number_dif_byte = 0; // количество различных байтов в файле
     while (!feof(file)) {
         input_byte = fgetc(file);
+        //fread(&input_byte, sizeof(input_byte), 1, file);
         // если у считанный байт еще не встречался в файле
         if (frequency_table[input_byte - INT8_MIN] == 0)
             number_dif_byte++;
@@ -111,7 +112,7 @@ void getCodes(Node* root, HuffmanCode codes[], uint64_t code, uint8_t number_of_
 
 void printCodes(HuffmanCode codes[]) {
     printf("\nХотите просмотреть коды Хаффмана?\nЧтобы пропустить, нажмите ESC.\n");
-    printf("Для подтверждения нажмите любую другую клавишу.\n");
+    printf("Для подтверждения нажмите любую другую клавишу.\n\n");
     if (_getch() != 27) { // функция _getch() возвращает код клавиши, 27 - код клавиши ESC
         system("cls");
         for (uint16_t i = 0; i <= UINT8_MAX; i++)

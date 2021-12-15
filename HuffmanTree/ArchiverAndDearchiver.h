@@ -11,17 +11,15 @@ FILE* openFile(char);
 
 // function: вывод размера файла
 // arguments: FILE* file - указатель на файл
-void fileSize(FILE*);
+uint32_t fileSize(FILE*);
 
 // function:
 // arguments:
 void tree(char*, const int);
 
-// function:
-// arguments:
-void stringTraversalTree(Node*);
-
 
 // function:
 // arguments:
-void archiver(FILE*, FILE*, HuffmanCode[], uint16_t);
+FILE* archiver(FILE*);
+
+void dearchiver(FILE*);

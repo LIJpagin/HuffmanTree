@@ -28,7 +28,7 @@ void fillBinaryTree(BinaryTree*, uint64_t[]);
 // function: построения дерева Хаффмана
 // arguments:
 // uint64_t frequency_table[] - таблица частот встречаимости байтов информации, заполненная определенным образом
-// uint16_t number_dif_char - количество различных символов в таблице частот встречаимости
+// uint16_t number_dif_char - количество различных байт в исходном файле
 // return: Node* root - указатель на корневой элемент дерева Хаффмана
 Node* buildHuffmanTree(uint64_t[], uint16_t);
 
