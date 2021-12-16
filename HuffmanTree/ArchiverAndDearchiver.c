@@ -1,45 +1,37 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "ArchiverAndDearchiver.h"
 
-#define getch _getch()
-#define pause system("pause")
-#define clear system("cls")
-#define mask (UINT64_MAX - (UINT64_MAX / 2))
-
-FILE* openFile(char mode) {
+FILE* openFileForRecording(char mode) {
     FILE* file = NULL;
     char* file_path = (char*)malloc(UCHAR_MAX * sizeof(char));
     memset(file_path, 0, UCHAR_MAX);
-    do {
-        switch (mode) {
-        case 'w':
-            printf("Введите путь к каталогу для сохранения файла (должен оканчиваться \"\\\"):\n");
-            gets(file_path);
-            printf("Введите имя архива без расширения:\n");
-            char* file_name = (char*)malloc(INT8_MAX * sizeof(char));
-            memset(file_name, 0, INT8_MAX);
-            gets(file_name);
-            strcat(file_path, file_name);
-            strcat(file_path, ".hfmn");
-            fopen_s(&file, file_path, "wb");
-            break;
-        case 'r':
-        default:
-            printf("Введите путь к файлу для сжатия или к архиву для распаковки:\n");
-            gets(file_path);
-            fopen_s(&file, file_path, "rb");
-            break;
-        }
-        if (file == NULL) {
-            printf("Файл не обнаружен или не был открыт! Попробуйте снова.");
-            getch; clear;
-        }
-    } while (file == NULL);
-    printf("\nФайл существует и успешно открыт.\n");
-    printf("Полный путь к файлу: %s\n", file_path);
-    if (mode == 'r')
+
+    if (mode == 'a') printf("Введите путь к каталогу для сохранения сжатого файла:\n");
+    else if (mode == 'f') printf("Введите путь к каталогу для сохранения распакованного файла:\n");
+    else return NULL;
+    gets(file_path);
+    if (file_path[strlen(file_path)] != '\\')
+        strcat(file_path, '\\');
+
+    if (mode == 'a') printf("Введите имя архива (без расширения):\n");
+    else if (mode == 'f') printf("Введите имя для распакованного файла (без расширения):\n");
+    char* file_name = (char*)malloc(INT8_MAX * sizeof(char));
+    memset(file_name, 0, INT8_MAX);
+    gets(file_name);
+    strcat(file_path, file_name);
+    free(file_name);
+
+    if (mode == 'a') strcat(file_path, ".hfmn");
+    else if (mode == 'f') strcat(file_path, ".txt");
+
+    fopen_s(&file, file_path, "wb");
+    if (file) {
+        printf("\nФайл существует и успешно открыт.\n");
+        printf("Полный путь к файлу: %s\n", file_path);
         printf("Размер файла: %d КБ\n", fileSize(file));
+    }
     free(file_path);
+
     return file;
 }
 
@@ -51,12 +43,12 @@ uint32_t fileSize(FILE* file) {
     return (fileSizeBytes / 1024);
 }
 
-FILE* archiver(FILE* source) {
+FILE* encoder(FILE* source) {
 
     //============================ ДЕРЕВО ХАФФМАНА ============================//
 
     // получаем таблицу частот встречаемости байтов информации в файле
-    uint64_t frequency_table[UINT8_MAX + 1] = { 0 };
+    uint32_t frequency_table[UINT8_MAX + 1] = { 0 };
     uint16_t number_dif_bytes = fillInFrequencyTable(source, frequency_table);
     // создаем бинарное дерево
     BinaryTree* tree = createBinaryTree(number_dif_bytes);
@@ -79,7 +71,8 @@ FILE* archiver(FILE* source) {
     // возвращаем указатель файла в начало 
     fseek(source, 0, SEEK_SET);
     // создаем файл для архива
-    FILE* archive = openFile('w');
+    FILE* archive = openFileForRecording('a');
+    if (!archive) return NULL;
     printf("Производится сжатие файла, пожалуйста, подождите...\n");
 
     //=================== ВЫВОД ИНФОРМАЦИИ ДЛЯ ДЕАРХИВАТОРА ===================//
@@ -90,7 +83,7 @@ FILE* archiver(FILE* source) {
     for (uint16_t i = 0; i <= UINT8_MAX; ++i)
         if (frequency_table[i] != 0) {
             fprintf(archive, "%c", i + INT8_MIN);
-            fwrite(frequency_table + i, sizeof(uint64_t), 1, archive);
+            fwrite(frequency_table + i, sizeof(uint32_t), 1, archive);
         }
 
     //============================== СЖАТИЕ ФАЙЛА =============================//
@@ -107,7 +100,7 @@ FILE* archiver(FILE* source) {
         uint8_t bit_pos = remainder; // отстаток от прошлого кода
         for (; bit_pos < codes[input_byte - INT8_MIN].size + remainder; bit_pos++) {
             // по маске выделяем первый слева бит кода и записываем его в байт для вывода
-            output_byte = output_byte | ((temp_code & mask) ? 1 : 0);
+            output_byte = output_byte | ((temp_code & (UINT64_MAX - UINT64_MAX / 2)) ? 1 : 0);
             output_byte <<= 1; // сдвигаем код влевона единицу
             if (bit_pos % CHAR_BIT == 0) // позиция в коде Хаффмана делится без остатка на 8
                 fputc(output_byte, archive); // выводим байт в выходной файл
@@ -119,26 +112,25 @@ FILE* archiver(FILE* source) {
         output_byte <<= 1; // сдвигаем код в начало байта
         fputc(output_byte, archive); // выводим его
     }
-    //fputc(-1, archive); // EOF
+    fputc(-1, archive); // EOF
     printf("Файл сжат!\n");
     printf("Размер файла: %d КБ\n", fileSize(archive));
     printf("Коэффициент сжатия файла: %4.3f\n", (float)fileSize(source) / (float)fileSize(archive));
-
     return archive;
 }
 
-void dearchiver(FILE* archive) {
+FILE* decoder(FILE* archive) {
 
     //======================= ЧТЕНИЕ ИНФОРМАЦИИ О СЖАТИИ ======================//
 
     // получаем из архива количество различных байтов в исходном файле
-    uint16_t number_dif_bytes = 0;
+    uint16_t number_dif_bytes;
     fread(&number_dif_bytes, sizeof(number_dif_bytes), 1, archive);
 
     // получаем таблицу частот встречаемости байтов информации
-    uint64_t frequency_table[UINT8_MAX + 1] = { 0 };
+    uint32_t frequency_table[UINT8_MAX + 1] = { 0 };
     for (uint16_t i = 0; i < number_dif_bytes; i++) {
-        char input_byte = 0; uint64_t frequency = 0;
+        char input_byte = 0; uint32_t frequency = 0;
         fscanf(archive, "%c%llu ", &input_byte, &frequency);
         frequency_table[input_byte - INT8_MIN] = frequency;
     }
@@ -161,10 +153,11 @@ void dearchiver(FILE* archive) {
     // при желании пользователь может просмотреть коды
     printCodes(codes);
     // производим сортировку кодов по длине, чем длиннее код, тем реже встречается
-    qsort(codes, number_dif_bytes, sizeof(HuffmanCode), compareDescending);
+    qsort(codes, number_dif_bytes, sizeof(HuffmanCode), compare2);
 
     // создаем файл для распаковки
-    FILE* file = openFile('w');
+    FILE* file = openFileForRecording('f');
+    if (!file) return NULL;
     printf("Производится распаковка файла, пожалуйста, подождите...\n");
 
     //============================ РАСПАКОВКА ФАЙЛА ===========================//
@@ -182,13 +175,13 @@ void dearchiver(FILE* archive) {
             for (uint8_t index = 0; index < number_dif_bytes; index++)
                 if (temp_code == codes[index].code) {
                     fputc(codes[index].byte, file);
+                    temp_code = 0;
                     exit;
                 }
         }
     }
-    //fputc(-1, archive); // EOF
     printf("Файл распакован!\n");
     printf("Размер файла: %d КБ\n", fileSize(archive));
 
-    fclose(file);
+    return file;
 }

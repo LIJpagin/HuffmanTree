@@ -9,7 +9,7 @@
 
 typedef struct Node {
     char byte;
-    uint64_t freq;
+    uint32_t freq;
     struct Node* left, * right;
 } Node;
 typedef struct BinaryTree {
@@ -26,22 +26,22 @@ typedef struct HuffmanCode {
 // function: заполнение таблицы частот встречаемости байтов информации
 // arguments:
 // FILE* file - указатель на файл для чтения
-// uint64_t frequency_table[] - таблица частот встречаимости байтов информации, заполненная определенным образом
-// return: uint16_t number_dif_byte - количество различных байтов в файле
-uint16_t fillInFrequencyTable(FILE*, uint64_t[]);
+// uint32_t frequency_table[] - таблица частот встречаимости байт информации, заполненная определенным образом
+// return: uint16_t number_dif_byte - количество различных байт в файле
+uint16_t fillInFrequencyTable(FILE*, uint32_t[]);
 
-// function: масштабирования частот встречаемости байтов в исходном файле
-// arguments: uint64_t frequency_table[] - таблица частот встречаимости байтов информации, заполненная определенным образом
-void ScalingOfNodeFrequencies(uint64_t[]);
+// function: масштабирование частот встречаемости байтов в исходном файле
+// arguments: uint32_t frequency_table[] - таблица частот встречаимости байт информации, заполненная определенным образом
+void ScalingOfNodeFrequencies(uint32_t[]);
 
 // function: создание нового узла
 // arguments:
 // char byte - байт информации из исходного файла
-// uint64_t freq - частота вхождений байта в исходный текст
+// uint32_t freq - частота вхождений байта в исходный текст
 // return: Node* node - указатель на созданный узел
-Node* newNode(char, uint64_t);
+Node* newNode(char, uint32_t);
 
-// function: создания бинарного дерева заданной вместимости
+// function: создание бинарного дерева заданной вместимости
 // arguments: uint16_t capacity - начальное количество узлов в дереве
 // return: BinaryTree* tree - указатель на корень дерева
 BinaryTree* createBinaryTree(uint16_t);
@@ -49,16 +49,16 @@ BinaryTree* createBinaryTree(uint16_t);
 // function: заполнение бинароное дерева указателями на узлы
 // arguments: 
 // BinaryTree* tree - указатель на бинарное дерево
-// uint64_t frequency_table[] - таблица частот встречаимости байтов информации, заполненная определенным образом
-void fillBinaryTree(BinaryTree*, uint64_t[]);
+// uint32_t frequency_table[] - таблица частот встречаимости байт информации, заполненная определенным образом
+void fillBinaryTree(BinaryTree*, uint32_t[]);
 
-// function: построения дерева Хаффмана
+// function: построение дерева Хаффмана
 // arguments:
 // BinaryTree* tree - указатель на созданное банарное дерево
-// uint64_t frequency_table[] - таблица частот встречаимости байтов информации, заполненная определенным образом
+// uint32_t frequency_table[] - таблица частот встречаимости байтов информации, заполненная определенным образом
 // uint16_t number_dif_char - количество различных байт в исходном файле
 // return: Node* root - указатель на корневой элемент дерева Хаффмана
-Node* buildHuffmanTree(BinaryTree*, uint64_t[], uint16_t);
+Node* buildHuffmanTree(BinaryTree*, uint32_t[], uint16_t);
 
 // function: проверка на условие равенства единице размера бинарного дерева
 // arguments: BinaryTree* tree - указатель на бинарное дерево
@@ -86,12 +86,17 @@ void insertNode(BinaryTree*, Node*, uint16_t);
 // arguments:
 // const void* a - первый указатель на элемент массива
 // const void* b - второй указатель на элемент массива
-// return: int64_t difference - разность частот встречаемости
-int64_t compareAscending(const void*, const void*);
+// return: int32_t difference - разность частот встречаемости
+int32_t compare1(const void*, const void*);
 
-uint8_t compareDescending(const void*, const void*);
+// function: сравнение длин кодов Хаффмана. Используется сортировкой qsort
+// arguments:
+// const void* a - первый указатель на элемент массива
+// const void* b - второй указатель на элемент массива
+// return: int8_t difference - разность длин кодов
+uint8_t compare2(const void*, const void*);
 
-// function: рекурсивая функция составление кодов Хаффмана обходом дерева Хаффмана
+// function: рекурсивная функция составления кодов Хаффмана прямым обходом дерева Хаффмана в глубину
 // arguments:
 // Node* root - указатель на корневой элемент дерева Хаффмана
 // HuffmanCode codes[] - массив кодов Хаффмана, изначально пуст
@@ -99,8 +104,15 @@ uint8_t compareDescending(const void*, const void*);
 // uint8_t number_of_bits - количество бит в коде, изначально равно 0
 void getCodesForCompression(Node*, HuffmanCode[], uint64_t, uint8_t);
 
+// function: рекурсивая функция составления кодов Хаффмана прямым обходом дерева Хаффмана в глубину
+// Отличается от getCodesForCompression способом заполнения массива кодов
+// arguments:
+// Node* root - указатель на корневой элемент дерева Хаффмана
+// HuffmanCode codes[] - массив кодов Хаффмана, изначально пуст
+// uint64_t code - переменная для записи кода при проходе по ветке, изначально равна 0
+// uint8_t number_of_bits - количество бит в коде, изначально равно 0
 void getCodesForDecompression(Node*, HuffmanCode[], uint64_t, uint8_t);
 
 // function: вывод кодов Хаффмана в консоль по желанию пользователя
-// arguments: // HuffmanCode codes[] - массив кодов Хаффмана
+// arguments: HuffmanCode codes[] - массив кодов Хаффмана
 void printCodes(HuffmanCode[]);

@@ -1,21 +1,23 @@
 #include "HuffmanTree.h"
 
-// function: открыти€ файла с подсказками дл€ пользовател€
-// arguments: char mode - символ, определ€ющий способ открыти€ файла:
-// 'r' - чтение
-// 'w' - запись
+// function: открыти€ файла дл€ записи
+// arguments: char mode - символ, определ€ющий расширение файла:
+// 'a' - архив
+// 'f' - файл текстовый
 // return: FILE* file - указатель на открытый файл
-FILE* openFile(char);
+FILE* openFileForRecording(char);
 
 // function: вывод размера файла
 // arguments: FILE* file - указатель на файл
 // return: uint32_t file_size - размер файла в  б
 uint32_t fileSize(FILE*);
 
-// function: архиваци€ файла
+// function: архивации файла
 // arguments: FILE* source - указатель на исходный файл
-FILE* archiver(FILE*);
+// return: FILE* archive - указатель на архив 
+FILE* encoder(FILE*);
 
-// function: разорхиваци€ файла
-// arguments: FILE* archiver - указатель на сжатый файл
-void dearchiver(FILE*);
+// function: распаковка файла
+// arguments: FILE* encoder - указатель на сжатый файл
+// return: FILE* file - указатель на текстовый файл 
+FILE* decoder(FILE*);

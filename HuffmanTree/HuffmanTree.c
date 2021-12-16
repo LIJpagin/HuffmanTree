@@ -1,6 +1,6 @@
 #include "HuffmanTree.h"
 
-uint16_t fillInFrequencyTable(FILE* file, uint64_t frequency_table[]) {
+uint16_t fillInFrequencyTable(FILE* file, uint32_t frequency_table[]) {
     char input_byte = 0; // переменная для временного хранения считанного байта информации
     uint16_t number_dif_byte = 0; // количество различных байтов в файле
     while (!feof(file)) {
@@ -16,15 +16,15 @@ uint16_t fillInFrequencyTable(FILE* file, uint64_t frequency_table[]) {
     return number_dif_byte;
 }
 
-void ScalingOfNodeFrequencies(uint64_t frequency_table[]) {
-    for (uint16_t i = 0; i <= UINT8_MAX; ++i)
+void ScalingOfNodeFrequencies(uint32_t frequency_table[]) {
+    for (uint32_t i = 0; i <= UINT8_MAX; ++i)
         // если при целочисленом делении на 2, частота встречаемости байта не равна 0
         if (frequency_table[i] / 2) {
             frequency_table[i] /= 2;
         }
 }
 
-Node* newNode(char byte, uint64_t freq) {
+Node* newNode(char byte, uint32_t freq) {
     Node* node = (Node*)malloc(sizeof(Node));
     node->byte = byte;
     node->freq = freq;
@@ -41,7 +41,7 @@ BinaryTree* createBinaryTree(uint16_t capacity) {
     return tree;
 }
 
-void fillBinaryTree(BinaryTree* tree, uint64_t frequency_table[]) {
+void fillBinaryTree(BinaryTree* tree, uint32_t frequency_table[]) {
     uint8_t j = 0; // счетчик для заполения массива дерева
     for (uint16_t i = 0; i <= UINT8_MAX; ++i)
         if (frequency_table[i] != 0) {
@@ -51,13 +51,13 @@ void fillBinaryTree(BinaryTree* tree, uint64_t frequency_table[]) {
         }
 }
 
-Node* buildHuffmanTree(BinaryTree* tree, uint64_t frequency_table[], uint16_t number_dif_char) {
+Node* buildHuffmanTree(BinaryTree* tree, uint32_t frequency_table[], uint16_t number_dif_char) {
     Node* left, * right, * top;
     // в цикле пока размер дерева не равен 1,
     // т.е. пока в дереве не останется только корень
     while (!isSizeOne(tree)) {
         // сортируем массив узлов дерева по возрастанию
-        qsort(tree->array, tree->size, sizeof(Node*), compareAscending);
+        qsort(tree->array, tree->size, sizeof(Node*), compare1);
         // извлекаем первый два узла с минимальными частотами встречаемости
         left = extractNode(tree, 0);
         right = extractNode(tree, 1);
@@ -95,13 +95,13 @@ void insertNode(BinaryTree* tree, Node* node, uint16_t index) {
     tree->array[index] = node;
 }
 
-int64_t compareAscending(const void* a, const void* b) {
+int32_t compare1(const void* a, const void* b) {
     const Node* const* aa = a;
     const Node* const* bb = b;
     return (*aa)->freq - (*bb)->freq;
 }
 
-uint8_t compareDescending(const void* a, const void* b) {
+uint8_t compare2(const void* a, const void* b) {
     uint8_t aa = ((HuffmanCode*)a)->size;
     uint8_t bb = ((HuffmanCode*)b)->size;
     return aa - bb;
@@ -125,10 +125,10 @@ void getCodesForCompression(Node* root, HuffmanCode codes[], uint64_t code, uint
 void getCodesForDecompression(Node* root, HuffmanCode codes[], uint64_t code, uint8_t number_of_bits) {
     if (root->left)
         // рекурсивно вызываем функцию для левого узла
-        getCodesForCompression(root->left, codes, (code << 1) | 0, number_of_bits + 1);
+        getCodesForDecompression(root->left, codes, (code << 1) | 0, number_of_bits + 1);
     if (root->right)
         // рекурсивно вызываем функцию для правого узла
-        getCodesForCompression(root->right, codes, (code << 1) | 1, number_of_bits + 1);
+        getCodesForDecompression(root->right, codes, (code << 1) | 1, number_of_bits + 1);
     if (isLeaf(root)) { // если узел конечный, т.е. является листом
         static uint16_t index = 0;
         codes[index].byte = root->byte; // сохраняем байт
