@@ -63,7 +63,7 @@ void archivingDirectory(char* basePath, const int root) {
             strcat_s(path, sizeof(path), dp->d_name);
             //printf("%s\n", path);
             //гдеяэ лнфмн гюосяйюрэ йндхпнбюмхе тюикю
-            tree(path, root + 2);
+            archivingDirectory(path, root + 2);
         }
     }
     free(path);

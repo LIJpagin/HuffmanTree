@@ -29,6 +29,10 @@ typedef struct HuffmanCode {
 // return: uint16_t number_dif_byte - количество различных байтов в файле
 uint16_t fillInFrequencyTable(FILE*, uint64_t[]);
 
+// function: масштабирования частот встречаемости байтов в исходном файле
+// arguments: uint64_t frequency_table[] - таблица частот встречаимости байтов информации, заполненная определенным образом
+void ScalingOfNodeFrequencies(uint64_t[]);
+
 // function: создание нового узла
 // arguments:
 // char byte - байт информации из исходного файла

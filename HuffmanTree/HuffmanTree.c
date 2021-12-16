@@ -9,9 +9,19 @@ uint16_t fillInFrequencyTable(FILE* file, uint64_t frequency_table[]) {
         // если у считанный байт еще не встречался в файле
         if (frequency_table[input_byte - INT8_MIN] == 0)
             number_dif_byte++;
+        if (frequency_table[input_byte - INT8_MIN] == UINT64_MAX)
+            ScalingOfNodeFrequencies(frequency_table);
         frequency_table[input_byte - INT8_MIN]++;
     }
     return number_dif_byte;
+}
+
+void ScalingOfNodeFrequencies(uint64_t frequency_table[]) {
+    for (uint16_t i = 0; i <= UINT8_MAX; ++i)
+        // если при целочисленом делении на 2, частота встречаемости байта не равна 0
+        if (frequency_table[i] / 2) {
+            frequency_table[i] /= 2;
+        }
 }
 
 Node* newNode(char byte, uint64_t freq) {
