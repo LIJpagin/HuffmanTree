@@ -1,5 +1,7 @@
 #include "ArchiverAndDearchiver.h"
 
+// C:\Games\War and Society.txt
+
 int main() {
     setlocale(LC_ALL, "Rus");
     FILE* source = NULL;
@@ -16,19 +18,22 @@ int main() {
             system("cls");
         }
         else {
-            if (strstr(source_path, ".hfmn"))
+            if (strstr(source_path, ".txt")) {
+                printf("\nФайл успешно создан.\n");
+                printf("Полный путь к файлу: %s\n", source_path);
+                printf("Размер файла: %d КБ\n", fileSize(source));
                 output = encoder(source);
-            else if (strstr(source_path, ".txt"))
+            }
+            else if (strstr(source_path, ".hfmn")) {
+                printf("\nФайл успешно создан.\n");
+                printf("Полный путь к файлу: %s\n", source_path);
+                printf("Размер файла: %d КБ\n", fileSize(source));
                 output = decoder('r');
+            }
             else {
                 fclose(source);
                 source == NULL;
                 printf("Простите, но мы не умеем архивировать такие файлы(\n");
-            }
-            if (source) {
-                printf("\nФайл существует и успешно открыт.\n");
-                printf("Полный путь к файлу: %s\n", source_path);
-                printf("Размер файла: %d КБ\n", fileSize(source));
             }
         }
     } while (!source);

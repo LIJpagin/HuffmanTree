@@ -12,6 +12,11 @@ FILE* openFileForRecording(char);
 // return: uint32_t file_size - размер файла в  б
 uint32_t fileSize(FILE*);
 
+// function: на данном этапе может рекурсивно выводить полные пути файлов
+// в заданной директории в консоль, но это уже можно использовать
+// дл€ создани€ архива директории
+void archivingDirectory(char*, const int);
+
 // function: архивации файла
 // arguments: FILE* source - указатель на исходный файл
 // return: FILE* archive - указатель на архив 

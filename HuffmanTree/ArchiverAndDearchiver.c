@@ -1,5 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "ArchiverAndDearchiver.h"
+#include <sys/types.h>
+#include "dirent.h"
 
 FILE* openFileForRecording(char mode) {
     FILE* file = NULL;
@@ -11,7 +13,7 @@ FILE* openFileForRecording(char mode) {
     else return NULL;
     gets(file_path);
     if (file_path[strlen(file_path)] != '\\')
-        strcat(file_path, '\\');
+        strcat(file_path, "\\");
 
     if (mode == 'a') printf("Введите имя архива (без расширения):\n");
     else if (mode == 'f') printf("Введите имя для распакованного файла (без расширения):\n");
@@ -41,6 +43,25 @@ uint32_t fileSize(FILE* file) {
     uint32_t fileSizeBytes = ftell(file); // получаем текущее положение указателя в байтах
     fseek(file, 0, SEEK_SET); // возвращаем указатель на начало файла
     return (fileSizeBytes / 1024);
+}
+
+void archivingDirectory(char* basePath, const int root) {
+    char* path = (char*)malloc(sizeof(char) * 1000);
+    struct dirent* dp;
+    DIR* dir = opendir(basePath);
+    if (!dir) return;
+    while ((dp = readdir(dir)) != NULL) {
+        if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0) {
+            strcpy_s(path, sizeof(path), basePath);
+            strcat_s(path, sizeof(path), "\\");
+            strcat_s(path, sizeof(path), dp->d_name);
+            printf("%s\n", path);
+            //ЗДЕСЬ МОЖНО ЗАПУСКАТЬ АРХИВАЦИЮ ФАЙЛОВ, ОДНАКО НУЖНО ПЕРЕПИСАТЬ КОДИРОВЩИК
+            archivingDirectory(path, root + 2);
+        }
+    }
+    free(path);
+    closedir(dir);
 }
 
 FILE* encoder(FILE* source) {
@@ -82,7 +103,8 @@ FILE* encoder(FILE* source) {
     // вывод символов и их частот
     for (uint16_t i = 0; i <= UINT8_MAX; ++i)
         if (frequency_table[i] != 0) {
-            fprintf(archive, "%c", i + INT8_MIN);
+            char input_byte = i + INT8_MIN;
+            fread(&input_byte, sizeof(input_byte), 1, archive);
             fwrite(frequency_table + i, sizeof(uint32_t), 1, archive);
         }
 
@@ -130,8 +152,9 @@ FILE* decoder(FILE* archive) {
     // получаем таблицу частот встречаемости байтов информации
     uint32_t frequency_table[UINT8_MAX + 1] = { 0 };
     for (uint16_t i = 0; i < number_dif_bytes; i++) {
-        char input_byte = 0; uint32_t frequency = 0;
-        fscanf(archive, "%c%llu ", &input_byte, &frequency);
+        char input_byte; uint32_t frequency;
+        fread(&input_byte, sizeof(input_byte), 1, archive);
+        fread(&frequency, sizeof(frequency), 1, archive);
         frequency_table[input_byte - INT8_MIN] = frequency;
     }
 
