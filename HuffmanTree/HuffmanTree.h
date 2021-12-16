@@ -18,6 +18,7 @@ typedef struct BinaryTree {
     Node** array;
 } BinaryTree;
 typedef struct HuffmanCode {
+    char byte;
     uint64_t code;
     uint8_t size;
 } HuffmanCode;
@@ -86,7 +87,9 @@ void insertNode(BinaryTree*, Node*, uint16_t);
 // const void* a - первый указатель на элемент массива
 // const void* b - второй указатель на элемент массива
 // return: int64_t difference - разность частот встречаемости
-int64_t compare(const void*, const void*);
+int64_t compareAscending(const void*, const void*);
+
+uint8_t compareDescending(const void*, const void*);
 
 // function: рекурсивая функция составление кодов Хаффмана обходом дерева Хаффмана
 // arguments:
@@ -94,7 +97,9 @@ int64_t compare(const void*, const void*);
 // HuffmanCode codes[] - массив кодов Хаффмана, изначально пуст
 // uint64_t code - переменная для записи кода при проходе по ветке, изначально равна 0
 // uint8_t number_of_bits - количество бит в коде, изначально равно 0
-void getCodes(Node*, HuffmanCode[], uint64_t, uint8_t);
+void getCodesForCompression(Node*, HuffmanCode[], uint64_t, uint8_t);
+
+void getCodesForDecompression(Node*, HuffmanCode[], uint64_t, uint8_t);
 
 // function: вывод кодов Хаффмана в консоль по желанию пользователя
 // arguments: // HuffmanCode codes[] - массив кодов Хаффмана

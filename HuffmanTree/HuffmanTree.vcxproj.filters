@@ -29,9 +29,6 @@
     <ClInclude Include="HuffmanTree.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="dirent.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="ArchiverAndDearchiver.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>

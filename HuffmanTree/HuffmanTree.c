@@ -51,13 +51,13 @@ void fillBinaryTree(BinaryTree* tree, uint64_t frequency_table[]) {
         }
 }
 
-Node* buildHuffmanTree(BinaryTree* tree,uint64_t frequency_table[], uint16_t number_dif_char) {
+Node* buildHuffmanTree(BinaryTree* tree, uint64_t frequency_table[], uint16_t number_dif_char) {
     Node* left, * right, * top;
     // в цикле пока размер дерева не равен 1,
     // т.е. пока в дереве не останется только корень
     while (!isSizeOne(tree)) {
         // сортируем массив узлов дерева по возрастанию
-        qsort(tree->array, tree->size, sizeof(Node*), compare);
+        qsort(tree->array, tree->size, sizeof(Node*), compareAscending);
         // извлекаем первый два узла с минимальными частотами встречаемости
         left = extractNode(tree, 0);
         right = extractNode(tree, 1);
@@ -95,24 +95,45 @@ void insertNode(BinaryTree* tree, Node* node, uint16_t index) {
     tree->array[index] = node;
 }
 
-int64_t compare(const void* a, const void* b) {
+int64_t compareAscending(const void* a, const void* b) {
     const Node* const* aa = a;
     const Node* const* bb = b;
     return (*aa)->freq - (*bb)->freq;
 }
 
-void getCodes(Node* root, HuffmanCode codes[], uint64_t code, uint8_t number_of_bits) {
+uint8_t compareDescending(const void* a, const void* b) {
+    uint8_t aa = ((HuffmanCode*)a)->size;
+    uint8_t bb = ((HuffmanCode*)b)->size;
+    return aa - bb;
+}
+
+void getCodesForCompression(Node* root, HuffmanCode codes[], uint64_t code, uint8_t number_of_bits) {
     // Функция необходима для производительного шифрования файла,
     // в ином случае для каждого символа приходилось бы каждый раз заново обходить дерево
     if (root->left)
         // рекурсивно вызываем функцию для левого узла
-        getCodes(root->left, codes, (code << 1) | 0, number_of_bits + 1);
+        getCodesForCompression(root->left, codes, (code << 1) | 0, number_of_bits + 1);
     if (root->right)
         // рекурсивно вызываем функцию для правого узла
-        getCodes(root->right, codes, (code << 1) | 1, number_of_bits + 1);
+        getCodesForCompression(root->right, codes, (code << 1) | 1, number_of_bits + 1);
     if (isLeaf(root)) { // если узел конечный, т.е. является листом
         codes[root->byte - INT8_MIN].code = code; // сохраняем код
         codes[root->byte - INT8_MIN].size = number_of_bits; // и количество битов в нем в массив
+    }
+}
+
+void getCodesForDecompression(Node* root, HuffmanCode codes[], uint64_t code, uint8_t number_of_bits) {
+    if (root->left)
+        // рекурсивно вызываем функцию для левого узла
+        getCodesForCompression(root->left, codes, (code << 1) | 0, number_of_bits + 1);
+    if (root->right)
+        // рекурсивно вызываем функцию для правого узла
+        getCodesForCompression(root->right, codes, (code << 1) | 1, number_of_bits + 1);
+    if (isLeaf(root)) { // если узел конечный, т.е. является листом
+        static uint16_t index = 0;
+        codes[index].byte = root->byte; // сохраняем байт
+        codes[index].code = code; // сохраняем код
+        codes[index].size = number_of_bits; // и количество битов в нем в массив
     }
 }
 

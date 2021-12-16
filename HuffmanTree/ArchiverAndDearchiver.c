@@ -13,7 +13,7 @@ FILE* openFile(char mode) {
     do {
         switch (mode) {
         case 'w':
-            printf("Введите путь к каталогу для сохранения архива (должен оканчиваться \"\\\"):\n");
+            printf("Введите путь к каталогу для сохранения файла (должен оканчиваться \"\\\"):\n");
             gets(file_path);
             printf("Введите имя архива без расширения:\n");
             char* file_name = (char*)malloc(INT8_MAX * sizeof(char));
@@ -25,7 +25,7 @@ FILE* openFile(char mode) {
             break;
         case 'r':
         default:
-            printf("Введите путь к файлу для архивирования или к архиву для разархивации:\n");
+            printf("Введите путь к файлу для сжатия или к архиву для распаковки:\n");
             gets(file_path);
             fopen_s(&file, file_path, "rb");
             break;
@@ -51,46 +51,6 @@ uint32_t fileSize(FILE* file) {
     return (fileSizeBytes / 1024);
 }
 
-void archivingDirectory(char* basePath, const int root) {
-    char* path = (char*)malloc(sizeof(char) * 1000);
-    struct dirent* dp;
-    DIR* dir = opendir(basePath);
-    if (!dir) return;
-    while ((dp = readdir(dir)) != NULL) {
-        if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0) {
-            strcpy_s(path, sizeof(path), basePath);
-            strcat_s(path, sizeof(path), "\\");
-            strcat_s(path, sizeof(path), dp->d_name);
-            //printf("%s\n", path);
-            //ЗДЕСЬ МОЖНО ЗАПУСКАТЬ КОДИРОВАНИЕ ФАЙЛА
-            archivingDirectory(path, root + 2);
-        }
-    }
-    free(path);
-    closedir(dir);
-}
-
-void stringTraversalTree(FILE* archive, Node* root, char* str_traversal) {
-    if (root->left) {
-        // конкатенируем к строке обхода символ D, это означает, что мы пошли по дереву вниз
-        strcat(str_traversal, "D");
-        // вызываем функцию для левого поддерева
-        stringTraversalTree(archive, root->left, str_traversal);
-    }
-    if (root->right) {
-        // конкатенируем к строке обхода символ D, это означает, что мы пошли по дереву вниз
-        strcat(str_traversal, "D");
-        // вызываем функцию для правого поддерева
-        stringTraversalTree(archive, root->right, str_traversal);
-    }
-    if (isLeaf(root)) {
-        // конкатенируем к строке обхода символ U, это означает, что мы пошли по дереву вверх
-        strcat(str_traversal, "U");
-        // выводим байт информации из узла в архив
-        fputc(root->byte, archive);
-    }
-}
-
 FILE* archiver(FILE* source) {
 
     //============================ ДЕРЕВО ХАФФМАНА ============================//
@@ -110,7 +70,7 @@ FILE* archiver(FILE* source) {
     HuffmanCode codes[UINT8_MAX + 1] = { 0 };
     uint64_t code = 0; uint8_t bits_in_code = 0;
     // получаем массив кодов Хаффмана
-    getCodes(root, codes, code, bits_in_code);
+    getCodesForCompression(root, codes, code, bits_in_code);
     // при желании пользователь может просмотреть коды
     printCodes(codes);
 
@@ -125,30 +85,19 @@ FILE* archiver(FILE* source) {
     //=================== ВЫВОД ИНФОРМАЦИИ ДЛЯ ДЕАРХИВАТОРА ===================//
 
     // записываем в выходной файл количество различных байтов в исходном файле
-    fprintf(archive, "%u", number_dif_bytes);
-
-    // записываем в выходной файл байты при прямом обходе дерева в глубину и одновременно создаем строку обхода
-    char* str_raversal = (char*)malloc(sizeof(char) * (UINT8_MAX + 1) * 4);
-    memset(str_raversal, 0, (UINT8_MAX + 1) * 2);
-    stringTraversalTree(archive, root, str_raversal);
-
-    // выводим количество бит строки обхода дерева
-    fprintf(archive, "%u", strcspn(str_raversal, "\0"));
-
-    // выводим строку обхода побайтно
-    uint8_t output_byte = 0, remainder = 0;
-    for (uint16_t i = 0; i < strcspn(str_raversal, "\0"); i++) {
-        // по маске выделяем первый слева бит кода и записываем его в байт для вывода
-        output_byte = output_byte | (str_raversal[i] == 'D' ? 1 : 0);
-        output_byte <<= 1; // сдвигаем код влево на единицу
-        if (i % CHAR_BIT == 0) // если позиция в коде делится без остатка на 8
-            fputc(output_byte, archive); // выводим байт в выходной файл
-    }
+    fwrite(&number_dif_bytes, sizeof(number_dif_bytes), 1, archive);
+    // вывод символов и их частот
+    for (uint16_t i = 0; i <= UINT8_MAX; ++i)
+        if (frequency_table[i] != 0) {
+            fprintf(archive, "%c", i + INT8_MIN);
+            fwrite(frequency_table + i, sizeof(uint64_t), 1, archive);
+        }
 
     //============================== СЖАТИЕ ФАЙЛА =============================//
 
     char input_byte = 0;
     uint64_t temp_code = 0;
+    uint8_t output_byte = 0, remainder = 0;
     // сжимаем файл, побайтно читая исходный файл
     while (!feof(source)) {
         input_byte = fgetc(source); // читаем байт из исходного файла
@@ -180,4 +129,66 @@ FILE* archiver(FILE* source) {
 
 void dearchiver(FILE* archive) {
 
+    //======================= ЧТЕНИЕ ИНФОРМАЦИИ О СЖАТИИ ======================//
+
+    // получаем из архива количество различных байтов в исходном файле
+    uint16_t number_dif_bytes = 0;
+    fread(&number_dif_bytes, sizeof(number_dif_bytes), 1, archive);
+
+    // получаем таблицу частот встречаемости байтов информации
+    uint64_t frequency_table[UINT8_MAX + 1] = { 0 };
+    for (uint16_t i = 0; i < number_dif_bytes; i++) {
+        char input_byte = 0; uint64_t frequency = 0;
+        fscanf(archive, "%c%llu ", &input_byte, &frequency);
+        frequency_table[input_byte - INT8_MIN] = frequency;
+    }
+
+    //============================ ДЕРЕВО ХАФФМАНА ============================//
+
+    // создаем бинарное дерево
+    BinaryTree* tree = createBinaryTree(number_dif_bytes);
+    // заполняем бираное дерево указателями на узлы
+    fillBinaryTree(tree, frequency_table);
+    // строим дерево Хаффмана
+    Node* root = buildHuffmanTree(tree, frequency_table, number_dif_bytes);
+
+    //============================= КОДЫ ХАФФМАНА =============================//
+
+    HuffmanCode codes[UINT8_MAX + 1] = { 0 };
+    uint64_t code = 0; uint8_t bits_in_code = 0;
+    // получаем массив кодов Хаффмана
+    getCodesForDecompression(root, codes, code, bits_in_code);
+    // при желании пользователь может просмотреть коды
+    printCodes(codes);
+    // производим сортировку кодов по длине, чем длиннее код, тем реже встречается
+    qsort(codes, number_dif_bytes, sizeof(HuffmanCode), compareDescending);
+
+    // создаем файл для распаковки
+    FILE* file = openFile('w');
+    printf("Производится распаковка файла, пожалуйста, подождите...\n");
+
+    //============================ РАСПАКОВКА ФАЙЛА ===========================//
+
+    char input_byte = 0;
+    uint64_t temp_code = 0;
+    uint8_t output_byte = 0, remainder = 0;
+    // сжимаем файл, побайтно читая исходный файл
+    while (!feof(archive)) {
+        input_byte = fgetc(archive); // читаем байт из архива
+        for (uint8_t bit_pos = 0; bit_pos < CHAR_BIT; bit_pos++) {
+            temp_code = input_byte & (UINT8_MAX - UINT8_MAX / 2);
+            temp_code <<= 1;
+            input_byte <<= 1;
+            for (uint8_t index = 0; index < number_dif_bytes; index++)
+                if (temp_code == codes[index].code) {
+                    fputc(codes[index].byte, file);
+                    exit;
+                }
+        }
+    }
+    //fputc(-1, archive); // EOF
+    printf("Файл распакован!\n");
+    printf("Размер файла: %d КБ\n", fileSize(archive));
+
+    fclose(file);
 }
