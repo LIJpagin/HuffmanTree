@@ -1,6 +1,8 @@
 #include "ArchiverAndDearchiver.h"
 
 // C:\Games\War and Society.txt
+// C:\Games\oblomov.txt
+// C:\Games\kapitanskaya-dochka.txt
 
 int main() {
     setlocale(LC_ALL, "Rus");
@@ -13,13 +15,13 @@ int main() {
         gets(source_path);
         fopen_s(&source, source_path, "rb");
         if (!source) {
-            printf("Файл не обнаружен или не был открыт! Попробуйте снова.");
+            printf("Файл не обнаружен или не был открыт! Попробуйте снова.\n");
             system("pause");
             system("cls");
         }
         else {
             if (strstr(source_path, ".txt")) {
-                printf("\nФайл успешно создан.\n");
+                printf("\nФайл успешно открыт для чтения.\n");
                 printf("Полный путь к файлу: %s\n", source_path);
                 printf("Размер файла: %d КБ\n", fileSize(source));
                 output = encoder(source);
@@ -37,7 +39,6 @@ int main() {
             }
         }
     } while (!source);
-    if (!output) printf("Файл не был создан!");
     free(source_path);
     _fcloseall();
     return 0;

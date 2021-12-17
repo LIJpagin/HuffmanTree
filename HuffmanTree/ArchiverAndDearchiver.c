@@ -7,30 +7,35 @@ FILE* openFileForRecording(char mode) {
     FILE* file = NULL;
     char* file_path = (char*)malloc(UCHAR_MAX * sizeof(char));
     memset(file_path, 0, UCHAR_MAX);
+    do {
+        if (mode == 'a') printf("Введите путь к каталогу для сохранения сжатого файла:\n");
+        else if (mode == 'f') printf("Введите путь к каталогу для сохранения распакованного файла:\n");
+        else return NULL;
+        gets(file_path);
+        if (file_path[strlen(file_path)] != '\\')
+            strcat(file_path, "\\");
 
-    if (mode == 'a') printf("Введите путь к каталогу для сохранения сжатого файла:\n");
-    else if (mode == 'f') printf("Введите путь к каталогу для сохранения распакованного файла:\n");
-    else return NULL;
-    gets(file_path);
-    if (file_path[strlen(file_path)] != '\\')
-        strcat(file_path, "\\");
+        if (mode == 'a') printf("Введите имя архива (без расширения):\n");
+        else if (mode == 'f') printf("Введите имя для распакованного файла (без расширения):\n");
+        char* file_name = (char*)malloc(INT8_MAX * sizeof(char));
+        memset(file_name, 0, INT8_MAX);
+        gets(file_name);
+        strcat(file_path, file_name);
+        free(file_name);
 
-    if (mode == 'a') printf("Введите имя архива (без расширения):\n");
-    else if (mode == 'f') printf("Введите имя для распакованного файла (без расширения):\n");
-    char* file_name = (char*)malloc(INT8_MAX * sizeof(char));
-    memset(file_name, 0, INT8_MAX);
-    gets(file_name);
-    strcat(file_path, file_name);
-    free(file_name);
+        if (mode == 'a') strcat(file_path, ".hfmn");
+        else if (mode == 'f') strcat(file_path, ".txt");
 
-    if (mode == 'a') strcat(file_path, ".hfmn");
-    else if (mode == 'f') strcat(file_path, ".txt");
-
-    fopen_s(&file, file_path, "wb");
+        fopen_s(&file, file_path, "wb");
+        if (!file) {
+            printf("Файл не был создан! Попробуйте снова.\n");
+            system("pause");
+            system("cls");
+        }
+    } while (!file);
     if (file) {
         printf("\nФайл существует и успешно открыт.\n");
         printf("Полный путь к файлу: %s\n", file_path);
-        printf("Размер файла: %d КБ\n", fileSize(file));
     }
     free(file_path);
 

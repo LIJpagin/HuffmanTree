@@ -9,7 +9,7 @@ uint16_t fillInFrequencyTable(FILE* file, uint32_t frequency_table[]) {
         // если у считанный байт еще не встречался в файле
         if (frequency_table[input_byte - INT8_MIN] == 0)
             number_dif_byte++;
-        if (frequency_table[input_byte - INT8_MIN] == UINT64_MAX)
+        if (frequency_table[input_byte - INT8_MIN] == UINT32_MAX)
             ScalingOfNodeFrequencies(frequency_table);
         frequency_table[input_byte - INT8_MIN]++;
     }
