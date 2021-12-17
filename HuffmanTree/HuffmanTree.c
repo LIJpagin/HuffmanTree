@@ -13,6 +13,8 @@ uint16_t fillInFrequencyTable(FILE* file, uint32_t frequency_table[]) {
             ScalingOfNodeFrequencies(frequency_table);
         frequency_table[input_byte - INT8_MIN]++;
     }
+    // возвращаем указатель файла в начало 
+    fseek(file, 0, SEEK_SET);
     return number_dif_byte;
 }
 

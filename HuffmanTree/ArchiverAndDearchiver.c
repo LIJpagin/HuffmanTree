@@ -89,8 +89,6 @@ FILE* encoder(FILE* source) {
 
     //============================ СОЗДАНИЕ АРХИВА ============================//
  
-    // возвращаем указатель файла в начало 
-    fseek(source, 0, SEEK_SET);
     // создаем файл для архива
     FILE* archive = openFileForRecording('a');
     if (!archive) return NULL;
@@ -104,7 +102,7 @@ FILE* encoder(FILE* source) {
     for (uint16_t i = 0; i <= UINT8_MAX; ++i)
         if (frequency_table[i] != 0) {
             char input_byte = i + INT8_MIN;
-            fread(&input_byte, sizeof(input_byte), 1, archive);
+            fwrite(&input_byte, sizeof(input_byte), 1, archive);
             fwrite(frequency_table + i, sizeof(uint32_t), 1, archive);
         }
 
@@ -123,7 +121,8 @@ FILE* encoder(FILE* source) {
         for (; bit_pos < codes[input_byte - INT8_MIN].size + remainder; bit_pos++) {
             // по маске выделяем первый слева бит кода и записываем его в байт для вывода
             output_byte = output_byte | ((temp_code & (UINT64_MAX - UINT64_MAX / 2)) ? 1 : 0);
-            output_byte <<= 1; // сдвигаем код влевона единицу
+            temp_code <<= 1;
+            output_byte <<= 1; // сдвигаем код влево на единицу
             if (bit_pos % CHAR_BIT == 0) // позиция в коде Хаффмана делится без остатка на 8
                 fputc(output_byte, archive); // выводим байт в выходной файл
                 //fwrite(&output, sizeof(output), 1, archive);
