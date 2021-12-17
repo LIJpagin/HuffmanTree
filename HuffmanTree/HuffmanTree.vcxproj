@@ -149,6 +149,11 @@
     <ClInclude Include="dirent.h" />
     <ClInclude Include="HuffmanTree.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\..\..\tests\test1\War and Society.txt" />
+    <Text Include="..\..\..\..\..\tests\test2\Oblomov.txt" />
+    <Text Include="..\..\..\..\..\tests\test3\Kapitanskaya dochka.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

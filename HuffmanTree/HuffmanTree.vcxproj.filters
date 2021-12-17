@@ -36,4 +36,15 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\..\..\tests\test1\War and Society.txt">
+      <Filter>Файлы ресурсов</Filter>
+    </Text>
+    <Text Include="..\..\..\..\..\tests\test2\Oblomov.txt">
+      <Filter>Файлы ресурсов</Filter>
+    </Text>
+    <Text Include="..\..\..\..\..\tests\test3\Kapitanskaya dochka.txt">
+      <Filter>Файлы ресурсов</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

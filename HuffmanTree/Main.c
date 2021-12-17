@@ -1,8 +1,8 @@
 #include "ArchiverAndDearchiver.h"
 
-// C:\Games\War and Society.txt
-// C:\Games\oblomov.txt
-// C:\Games\kapitanskaya-dochka.txt
+// C:\tests\test1\War and Society.hfmn
+// C:\tests\test2\Oblomov.hfmn
+// C:\tests\test3\Kapitanskaya dochka.hfmn
 
 int main() {
     setlocale(LC_ALL, "Rus");
@@ -27,7 +27,7 @@ int main() {
                 output = encoder(source);
             }
             else if (strstr(source_path, ".hfmn")) {
-                printf("\nФайл успешно создан.\n");
+                printf("\nФайл успешно открыт для чтения.\n");
                 printf("Полный путь к файлу: %s\n", source_path);
                 printf("Размер файла: %d КБ\n", fileSize(source));
                 output = decoder('r');
